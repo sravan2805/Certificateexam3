@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import './project.css'; // ✅ Import external CSS
 
 const Projects = () => {
   const [projects, setProjects] = useState([]);
-  const [newProject, setNewProject] = useState({ name: '', description: '' }); // Removed members
+  const [newProject, setNewProject] = useState({ name: '', description: '' });
   const [newTask, setNewTask] = useState({ title: '', description: '', assignedTo: '' });
   const [userId, setUserId] = useState(null);
 
@@ -44,7 +45,7 @@ const Projects = () => {
       const response = await axios.post(`${baseURL}/projects`, {
         name: newProject.name,
         description: newProject.description,
-        createdBy: userId, // Pass only name, description, and createdBy
+        createdBy: userId,
       });
 
       console.log('✅ Project added:', response.data);
@@ -88,25 +89,23 @@ const Projects = () => {
       console.error('❌ Task title and description are required');
       return;
     }
-  
-    // ✅ Check if assignedTo is empty and remove it
+
     const taskData = {
       title: newTask.title,
       description: newTask.description,
     };
-  
-    // Only add assignedTo if it's not empty
+
     if (newTask.assignedTo.trim()) {
       taskData.assignedTo = newTask.assignedTo;
     }
-  
+
     try {
       console.log('📡 Sending task to backend...');
       console.log('📦 Task data:', taskData);
-  
+
       const response = await axios.post(`${baseURL}/projects/${projectId}/tasks`, taskData);
       console.log('✅ Task added:', response.data);
-  
+
       setNewTask({ title: '', description: '', assignedTo: '' });
       alert('Task added successfully!');
       fetchProjects();
@@ -114,7 +113,7 @@ const Projects = () => {
       console.error('🔥 Error adding task:', error.response?.data?.error || error.message);
     }
   };
-  
+
   // Edit a task
   const editTask = async (projectId, taskId) => {
     const updatedTitle = prompt('Edit Task Title:');
@@ -135,7 +134,7 @@ const Projects = () => {
   const deleteTask = async (projectId, taskId) => {
     try {
       await axios.delete(`${baseURL}/projects/${projectId}/tasks/${taskId}`);
-      fetchProjects(); // Refresh after deleting task
+      fetchProjects();
     } catch (error) {
       console.error('Error deleting task:', error.response?.data?.message || error.message);
     }
@@ -149,65 +148,87 @@ const Projects = () => {
   }, [userId]);
 
   return (
-    <div>
-      <h2>My Projects</h2>
+    <div className="projects-container">
+      <h2 className="section-title">My Projects</h2>
 
-      {/* Add Project */}
-      <div>
+      {/* Add Project Section */}
+      <div className="add-project">
         <input
           type="text"
           placeholder="Project Name"
           value={newProject.name}
           onChange={(e) => setNewProject({ ...newProject, name: e.target.value })}
+          className="input-field"
         />
         <input
           type="text"
           placeholder="Project Description"
           value={newProject.description}
           onChange={(e) => setNewProject({ ...newProject, description: e.target.value })}
+          className="input-field"
         />
-        <button onClick={addProject}>Add Project</button>
+        <button onClick={addProject} className="add-btn">
+          Add Project
+        </button>
       </div>
 
       {/* Project List */}
-      <ul>
+      <ul className="project-grid">
         {projects.length === 0 ? (
-          <p>No projects available. Add a project to get started!</p>
+          <p className="no-projects">No projects available. Add a project to get started!</p>
         ) : (
           projects.map((project) => (
-            <li key={project._id}>
-              <div>
-                <strong>{project.name}</strong> - {project.description}
+            <li key={project._id} className="project-card">
+              <div className="project-content">
+                <strong className="project-title">{project.name}</strong>
+                <p className="project-description">{project.description}</p>
               </div>
-              <button onClick={() => editProject(project._id)}>Edit</button>
-              <button onClick={() => deleteProject(project._id)}>Delete</button>
+              <div className="button-group">
+                <button className="edit-btn" onClick={() => editProject(project._id)}>
+                  Edit
+                </button>
+                <button className="delete-btn" onClick={() => deleteProject(project._id)}>
+                  Delete
+                </button>
+              </div>
 
-              {/* Add Task to Project */}
-              <div>
+              {/* Add Task Section */}
+              <div className="add-task">
                 <input
                   type="text"
                   placeholder="Task Title"
                   value={newTask.title}
                   onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
+                  className="input-field"
                 />
                 <input
                   type="text"
                   placeholder="Task Description"
                   value={newTask.description}
                   onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
+                  className="input-field"
                 />
-                <button onClick={() => addTask(project._id)}>Add Task</button>
+                <button onClick={() => addTask(project._id)} className="add-btn">
+                  Add Task
+                </button>
               </div>
 
               {/* Task List */}
-              <ul>
+              <ul className="task-list">
                 {project.tasks.map((task) => (
-                  <li key={task._id}>
+                  <li key={task._id} className="task-card">
                     <div>
-                      {task.title} - {task.description}
+                      <strong className="task-title">{task.title}</strong> -{' '}
+                      <span className="task-desc">{task.description}</span>
                     </div>
-                    <button onClick={() => editTask(project._id, task._id)}>Edit Task</button>
-                    <button onClick={() => deleteTask(project._id, task._id)}>Delete Task</button>
+                    <div className="button-group">
+                      <button className="edit-btn" onClick={() => editTask(project._id, task._id)}>
+                        Edit Task
+                      </button>
+                      <button className="delete-btn" onClick={() => deleteTask(project._id, task._id)}>
+                        Delete Task
+                      </button>
+                    </div>
                   </li>
                 ))}
               </ul>
@@ -215,43 +236,6 @@ const Projects = () => {
           ))
         )}
       </ul>
-
-      {/* Basic CSS for layout */}
-      <style>
-        {`
-          div {
-            margin-bottom: 10px;
-          }
-          ul {
-            list-style-type: none;
-            padding: 0;
-          }
-          li {
-            margin-bottom: 10px;
-            border: 1px solid #ccc;
-            padding: 10px;
-            border-radius: 5px;
-            background-color: #f9f9f9;
-          }
-          button {
-            margin: 5px;
-            padding: 5px 10px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-          }
-          button:hover {
-            background-color: #0056b3;
-          }
-          input {
-            margin: 5px 0;
-            padding: 8px;
-            width: 200px;
-          }
-        `}
-      </style>
     </div>
   );
 };

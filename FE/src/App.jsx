@@ -5,6 +5,7 @@ import Login from './components/login/login.jsx';
 import Projects from './components/project/project.jsx';
 import Logout from './components/logout/logout.jsx';
 import { AuthProvider, useAuth } from './components/context/AuthContext.jsx'; // Import the necessary context
+import './App.css';
 
 const PrivateRoute = ({ children }) => {
     const { isAuthenticated } = useAuth();  // Use the hook to check authentication state

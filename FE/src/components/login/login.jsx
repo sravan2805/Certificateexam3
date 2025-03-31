@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext'; // Import the AuthContext
+import './login.css'
 
 const Login = () => {
     const [formData, setFormData] = useState({ email: '', password: '' });
