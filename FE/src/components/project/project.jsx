@@ -84,17 +84,37 @@ const Projects = () => {
 
   // Add a task to a project
   const addTask = async (projectId) => {
-    if (!newTask.title.trim() || !newTask.description.trim()) return;
+    if (!newTask.title.trim() || !newTask.description.trim()) {
+      console.error('❌ Task title and description are required');
+      return;
+    }
+  
+    // ✅ Check if assignedTo is empty and remove it
+    const taskData = {
+      title: newTask.title,
+      description: newTask.description,
+    };
+  
+    // Only add assignedTo if it's not empty
+    if (newTask.assignedTo.trim()) {
+      taskData.assignedTo = newTask.assignedTo;
+    }
+  
     try {
-      await axios.post(`${baseURL}/projects/${projectId}/tasks`, newTask);
+      console.log('📡 Sending task to backend...');
+      console.log('📦 Task data:', taskData);
+  
+      const response = await axios.post(`${baseURL}/projects/${projectId}/tasks`, taskData);
+      console.log('✅ Task added:', response.data);
+  
       setNewTask({ title: '', description: '', assignedTo: '' });
       alert('Task added successfully!');
-      fetchProjects(); // Refresh projects after adding task
+      fetchProjects();
     } catch (error) {
-      console.error('Error adding task:', error.response?.data?.message || error.message);
+      console.error('🔥 Error adding task:', error.response?.data?.error || error.message);
     }
   };
-
+  
   // Edit a task
   const editTask = async (projectId, taskId) => {
     const updatedTitle = prompt('Edit Task Title:');

@@ -74,21 +74,36 @@ export const deleteProject = async (req, res) => {
 };
 
 // Add task to project
+
 export const addTask = async (req, res) => {
   const { id } = req.params;
-  const task = req.body;
+  let task = req.body;
+
   try {
+    console.log('🔎 Received Task Data:', task);
+
+    // Remove assignedTo if empty or invalid
+    if (!task.assignedTo || task.assignedTo.trim() === '') {
+      delete task.assignedTo;
+    }
+
     const project = await Project.findById(id);
     if (!project) {
+      console.error('❌ Project not found');
       return res.status(404).json({ error: 'Project not found' });
     }
+
     project.tasks.push(task);
     await project.save();
+    console.log('✅ Task added successfully:', task);
+
     res.status(201).json({ message: 'Task added successfully', project });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('🔥 Error adding task:', error.message);
+    res.status(500).json({ error: error.message || 'Failed to add task' });
   }
 };
+
 
 // Update task details
 export const updateTask = async (req, res) => {
